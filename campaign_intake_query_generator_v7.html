@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campaign Intake & Query Generator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font:14px Arial,sans-serif}
+.wrap{max-width:1150px;margin:auto;padding:24px 16px 60px}.hero{background:#2563eb;color:#fff;border-radius:16px;padding:25px;margin-bottom:18px}
+.hero h1{margin:0 0 6px;font-size:26px}.hero p{margin:0;opacity:.9}.card{background:#fff;border:1px solid #dfe4ec;border-radius:14px;padding:20px;margin:16px 0}
+h2{font-size:19px;margin:0 0 17px}h3{font-size:15px;margin:20px 0 12px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}label{font-weight:700;font-size:13px}
+select,input{padding:10px;border:1px solid #cfd6e2;border-radius:8px;font:inherit;background:#fff}.hidden{display:none!important}
+.sub{background:#f8fafc;border:1px solid #e4e7ec;border-radius:10px;padding:14px;margin-top:12px}
+.output{background:#101828;color:#f2f4f7;border-radius:10px;padding:16px;white-space:pre-wrap;line-height:1.6;min-height:75px}
+.empty{color:#98a2b3}.btns{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}
+button{border:0;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer}.primary{background:#2563eb;color:#fff}.secondary{background:#eef2f6;color:#344054}
+.note{background:#eff8ff;border:1px solid #b2ddff;color:#175cd3;padding:10px;border-radius:8px;font-size:12px;margin-top:10px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wrap{padding:12px 9px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero"><h1>Campaign Intake & Query Generator</h1><p>Generate consolidated, client-ready SFMC and HTML queries.</p></div>
+
+<section class="card">
+<h2>1. Request Type</h2>
+<div class="field"><label>What type of request is this?</label>
+<select id="requestType">
+<option value="">Select...</option><option value="both">SFMC + HTML</option><option value="html">HTML Only</option>
+</select></div>
+</section>
+
+<section id="sfmcSection" class="card hidden">
+<h2>2. SFMC Details</h2>
+
+<h3>Campaign Information</h3>
+<div class="grid">
+<div class="field"><label>Brand Name</label><select id="brand"><option value="">Select...</option><option value="yes">Provided</option><option value="no">Not Provided</option></select></div>
+<div class="field"><label>Target Audience (TA)</label><select id="ta"><option value="">Select...</option><option value="yes">Provided</option><option value="no">Not Provided</option></select></div>
+<div id="taAzureField" class="field hidden"><label>Does Azure mention TA will be provided?</label><select id="taAzure"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+<div id="contactField" class="field hidden"><label>Contact IDs provided for TA?</label><select id="contactId"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+<div class="field"><label>PRT in Figma/PDF</label><input id="assetPrt" placeholder="e.g. 123"></div>
+<div class="field"><label>PRT in Azure</label><input id="azurePrt" placeholder="e.g. 456"></div>
+<div class="field"><label>Sender Profile mentioned in Azure</label><select id="senderProfile"><option value="">Select...</option><option value="correct">Provided / Correct</option><option value="missing">Not Provided</option><option value="incorrect">Provided / Incorrect</option></select></div>
+</div>
+
+<h3>Initial / A-B Decision</h3>
+<div class="grid">
+<div class="field"><label>Is A/B Testing present?</label><select id="abTest"><option value="">Select...</option><option value="no">No</option><option value="yes">Yes</option></select></div>
+<div class="field"><label>Is a Reminder email present?</label><select id="reminder"><option value="">Select...</option><option value="no">No</option><option value="yes">Yes</option></select></div>
+</div>
+
+<div id="singleNoReminder" class="sub hidden">
+<h3 style="margin-top:0">Initial Subject Line & Preheader</h3>
+<div class="grid">
+<div class="field"><label>Initial Subject Line</label><select id="initialSL"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option></select></div>
+<div class="field"><label>Initial Preheader</label><select id="initialPH"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option><option value="none">Explicitly Don't Use</option></select></div>
+</div>
+</div>
+
+<div id="nonAbReminder" class="sub hidden">
+<h3 style="margin-top:0">Initial & Reminder Subject Line / Preheader</h3>
+<div class="grid">
+<div class="field"><label>Initial Subject Line</label><select id="iRSL"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option></select></div>
+<div class="field"><label>Initial Preheader</label><select id="iRPH"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option><option value="none">Explicitly Don't Use</option></select></div>
+<div class="field"><label>Reminder Subject Line</label><select id="rSL"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option></select></div>
+<div class="field"><label>Reminder Preheader</label><select id="rPH"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="none">Explicitly Don't Use</option></select></div>
+</div>
+<div class="note">If Initial Subject Line/Preheader is Not Provided or Multiple Provided, the Reminder follows the same status and is not asked again. If Initial is Provided, the tool asks only whether the Reminder is Provided or Not Provided.</div>
+</div>
+
+<div id="abFields" class="sub hidden">
+<h3 style="margin-top:0">A/B Test Subject Lines & Preheaders</h3>
+<div class="grid">
+<div class="field"><label>Variant A – Subject Line (SLA)</label><select id="aSL"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option></select></div>
+<div class="field"><label>Variant A – Preheader (PHA)</label><select id="aPH"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option><option value="none">Explicitly Don't Use</option></select></div>
+<div class="field"><label>Variant B – Subject Line (SLB)</label><select id="bSL"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option></select></div>
+<div class="field"><label>Variant B – Preheader (PHB)</label><select id="bPH"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="multiple">Multiple Provided</option><option value="none">Explicitly Don't Use</option></select></div>
+</div>
+<div class="note">When A/B Testing is Yes, Reminder SL/PH are not asked again. Reminder uses the corresponding A/B variant values.</div>
+</div>
+
+<h3>Launch Details</h3>
+<div class="grid">
+<div class="field"><label>Initial Launch Date</label><select id="initialDate"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option></select></div>
+<div class="field"><label>Initial Launch Time</label><select id="initialTime"><option value="">Select...</option><option value="provided">Provided / Correct</option><option value="12am">Mentioned as 12:00 AM</option><option value="missing">Not Provided</option></select></div>
+<div id="remDateField" class="field hidden"><label>Reminder Launch Date</label><select id="remDate"><option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option></select></div>
+<div id="remTimeField" class="field hidden"><label>Reminder Launch Time</label><select id="remTime"><option value="">Select...</option><option value="provided">Provided / Correct</option><option value="12am">Mentioned as 12:00 AM</option><option value="missing">Not Provided</option></select></div>
+</div>
+</section>
+
+<section id="htmlSection" class="card hidden">
+<h2>3. HTML Details</h2>
+<div class="grid">
+<div class="field"><label>Campaign Images</label><select id="images"><option value="">Select...</option><option value="yes">Provided / Extracted</option><option value="pdfOnly">Only PDF provided and images cannot be extracted</option><option value="no">Not Provided</option></select></div>
+<div class="field"><label>Unsubscribe</label><select id="unsubscribe"><option value="">Select...</option><option value="yes">Present</option><option value="update">Update Preference</option><option value="no">Not Present</option></select></div>
+<div class="field"><label>Links</label><select id="links"><option value="">Select...</option><option value="yes">All Provided</option><option value="missing">No / Some Missing</option><option value="error">Provided but redirects to error page</option></select></div>
+<div id="linkDetailField" class="field hidden"><label>Link / CTA details</label><input id="linkDetail" placeholder="e.g. Learn More - URL"></div>
+<div class="field"><label>UTM Parameters</label><select id="utm"><option value="">Select...</option><option value="yes">Provided</option><option value="no">Not Provided</option></select></div>
+<div class="field"><label>Bayer Address</label><select id="address"><option value="">Select...</option><option value="yes">Present</option><option value="no">Not Present</option></select></div>
+<div class="field"><label>Mobile Number</label><select id="mobile"><option value="">Select...</option><option value="yes">Present</option><option value="no">Not Present</option></select></div>
+</div>
+<div id="mobileNote" class="note hidden">The mobile number will be made clickable using a tel: link.</div>
+</section>
+
+<section id="outputSection" class="card hidden">
+<h2>4. Generated Client Queries</h2>
+<div id="sfmcOutWrap"><h3>SFMC Queries</h3><div id="sfmcOutput" class="output empty">No SFMC queries generated from the selected inputs.</div><div class="btns"><button class="primary" id="copySfmc">Copy SFMC Queries</button></div></div>
+<div id="htmlOutWrap"><h3>HTML Queries</h3><div id="htmlOutput" class="output empty">No HTML queries generated from the selected inputs.</div><div class="btns"><button class="primary" id="copyHtml">Copy HTML Queries</button></div></div>
+<div class="btns"><button class="primary" id="copyAll">Copy All Queries</button><button class="secondary" id="reset">Reset</button></div>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+function $(id){return document.getElementById(id)}
+function v(id){var e=$(id);return e?e.value:""}
+function add(a,s){if(s)a.push(s)}
+
+function syncReminderChoices(){
+  var iSL=v("iRSL"), iPH=v("iRPH");
+  var rSL=$("rSL"), rPH=$("rPH");
+  if(!rSL || !rPH)return;
+
+  // If Initial is Missing or Multiple, Reminder follows the same status,
+  // so there is no reason to ask the same question again.
+  var oldSL=rSL.value, oldPH=rPH.value;
+
+  if(iSL==="missing" || iSL==="multiple"){
+    rSL.innerHTML='<option value="">Select...</option><option value="same">Same as Initial</option>';
+  }else{
+    rSL.innerHTML='<option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option>';
+  }
+
+  if(iPH==="missing" || iPH==="multiple"){
+    rPH.innerHTML='<option value="">Select...</option><option value="same">Same as Initial</option>';
+  }else if(iPH==="none"){
+    rPH.innerHTML='<option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="none">Explicitly Don\'t Use</option>';
+  }else{
+    rPH.innerHTML='<option value="">Select...</option><option value="provided">Provided</option><option value="missing">Not Provided</option><option value="none">Explicitly Don\'t Use</option>';
+  }
+
+  // Preserve the user's Reminder selection when the dropdown is refreshed.
+  if(Array.from(rSL.options).some(function(o){return o.value===oldSL;})) rSL.value=oldSL;
+  if(Array.from(rPH.options).some(function(o){return o.value===oldPH;})) rPH.value=oldPH;
+}
+
+function visibility(){
+  var type=v("requestType"), ab=v("abTest"), rem=v("reminder");
+  $("sfmcSection").classList.toggle("hidden",type!=="both");
+  $("htmlSection").classList.toggle("hidden",type!=="both" && type!=="html");
+  $("outputSection").classList.toggle("hidden",type!=="both" && type!=="html");
+  $("sfmcOutWrap").classList.toggle("hidden",type!=="both");
+  $("htmlOutWrap").classList.toggle("hidden",type!=="both" && type!=="html");
+
+  $("taAzureField").classList.toggle("hidden",v("ta")!=="no");
+  $("contactField").classList.toggle("hidden",v("ta")!=="yes");
+
+  $("singleNoReminder").classList.toggle("hidden",!(ab==="no" && rem==="no"));
+  $("nonAbReminder").classList.toggle("hidden",!(ab==="no" && rem==="yes"));
+  $("abFields").classList.toggle("hidden",ab!=="yes");
+
+  $("remDateField").classList.toggle("hidden",rem!=="yes");
+  $("remTimeField").classList.toggle("hidden",rem!=="yes");
+
+  $("linkDetailField").classList.toggle("hidden",v("links")!=="missing" && v("links")!=="error");
+  $("mobileNote").classList.toggle("hidden",v("mobile")!=="yes");
+}
+
+function render(id,arr){
+  var e=$(id);
+  e.textContent=arr.length?arr.map(function(x,i){return (i+1)+". "+x}).join("\n\n"):"No queries generated from the selected inputs.";
+  e.classList.toggle("empty",!arr.length);
+}
+
+function generate(){
+  var type=v("requestType"), sf=[], ht=[];
+  if(!type){render("sfmcOutput",[]);render("htmlOutput",[]);return}
+
+  if(type==="both"){
+    if(v("brand")==="no")add(sf,"Please provide the Brand Name for this campaign.");
+    if(v("ta")==="no"){
+      if(v("taAzure")==="yes")add(sf,"TA is not provided in the current campaign assets. As mentioned in Azure, TA will be provided separately. Please confirm when we can expect the TA.");
+      else if(v("taAzure")==="no")add(sf,"TA is not provided in the current campaign assets. Please confirm when we can expect the TA.");
+    }
+    if(v("ta")==="yes" && v("contactId")==="no")add(sf,"No Contact ID has been provided for this TA. Please confirm whether a Contact ID should be provided or whether we should use the email address as the Subscriber Key.");
+
+    var ab=v("abTest"), rem=v("reminder");
+
+    if(ab==="no" && rem==="no"){
+      var isl=v("initialSL"),iph=v("initialPH");
+      if(isl==="missing" && iph==="missing")add(sf,"Subject Line and Preheader have not been provided for the initial email. Please provide the Subject Line and confirm/provide the Preheader.");
+      else{
+        if(isl==="missing")add(sf,"Subject Line has not been provided for the initial email. Please provide the Subject Line.");
+        if(isl==="multiple")add(sf,"Multiple Subject Lines have been provided for the initial email. Please confirm which Subject Line should be used.");
+        if(iph==="missing")add(sf,"Preheader has not been provided for the initial email. Please confirm whether a Preheader should be used and provide it if applicable.");
+        if(iph==="multiple")add(sf,"Multiple Preheaders have been provided for the initial email. Please confirm which Preheader should be used.");
+      }
+    }
+
+    if(ab==="no" && rem==="yes"){
+      var is=v("iRSL"),ip=v("iRPH"),rs=v("rSL"),rp=v("rPH");
+
+      // If Initial SL is missing/multiple, the Reminder has the same status.
+      // Therefore only one consolidated query is required.
+      if(is==="missing")add(sf,"Subject Lines have not been provided for both the initial and Reminder emails. Please provide the Subject Lines for both emails.");
+      else if(is==="multiple")add(sf,"Multiple Subject Lines have been provided for both the initial and Reminder emails. Please confirm which Subject Line should be used for each email.");
+      else if(is==="provided" && rs==="missing")add(sf,"Subject Line has been provided for the initial email, but it has not been provided for the Reminder email. Please provide the Reminder Subject Line.");
+
+      // Same principle for Preheader. If Initial PH is missing/multiple, don't ask again.
+      if(ip==="missing")add(sf,"Preheaders have not been provided for both the initial and Reminder emails. Please confirm whether Preheaders should be used and provide them for both emails if applicable.");
+      else if(ip==="multiple")add(sf,"Multiple Preheaders have been provided for both the initial and Reminder emails. Please confirm which Preheader should be used for each email.");
+      else if(ip==="provided" && rp==="missing")add(sf,"Preheader has been provided for the initial email, but it has not been provided for the Reminder email. Please confirm whether the same Preheader used for the initial email should be used for the Reminder or provide a separate Preheader.");
+    }
+
+    if(ab==="yes"){
+      var asl=v("aSL"),aph=v("aPH"),bsl=v("bSL"),bph=v("bPH");
+      if(asl==="missing" && bsl==="missing")add(sf,"Subject Lines (SLA and SLB) have not been provided for the A/B test. Please provide both Subject Lines.");
+      else{
+        if(asl==="missing")add(sf,"Subject Line (SLA) for Variant A has not been provided. Please provide the Subject Line (SLA).");
+        if(asl==="multiple")add(sf,"Multiple Subject Lines have been provided for Variant A. Please confirm which Subject Line should be used.");
+        if(bsl==="missing")add(sf,"Subject Line (SLB) for Variant B has not been provided. Please provide the Subject Line (SLB).");
+        if(bsl==="multiple")add(sf,"Multiple Subject Lines have been provided for Variant B. Please confirm which Subject Line should be used.");
+      }
+      if(aph==="missing" && bph==="missing")add(sf,"Preheaders (PHA and PHB) have not been provided for the A/B test. Please confirm whether Preheaders should be used and provide both if applicable.");
+      else{
+        if(aph==="missing")add(sf,"Preheader (PHA) for Variant A has not been provided. Please confirm whether a Preheader (PHA) should be used.");
+        if(aph==="multiple")add(sf,"Multiple Preheaders have been provided for Variant A. Please confirm which Preheader should be used.");
+        if(bph==="missing")add(sf,"Preheader (PHB) for Variant B has not been provided. Please confirm whether a Preheader (PHB) should be used.");
+        if(bph==="multiple")add(sf,"Multiple Preheaders have been provided for Variant B. Please confirm which Preheader should be used.");
+      }
+      // No Reminder SL/PH questions are generated in A/B mode.
+    }
+
+    var id=v("initialDate"),it=v("initialTime");
+    if(id==="missing" && rem==="yes" && v("remDate")==="missing")add(sf,"The launch date has not been provided for both the initial and Reminder emails. Please confirm the launch dates.");
+    else{
+      if(id==="missing")add(sf,"Launch date for the initial email has not been provided. Please confirm the initial launch date.");
+      if(rem==="yes" && v("remDate")==="missing")add(sf,"Launch date for the Reminder email has not been provided. Please confirm the Reminder launch date.");
+    }
+    if(it==="12am" && rem==="yes" && v("remTime")==="12am")add(sf,"The launch time for both the initial and Reminder emails is mentioned as 12:00 AM in Azure. Please confirm whether both emails should be launched at 12:00 AM.");
+    else{
+      if(it==="12am")add(sf,"The initial email launch time is mentioned as 12:00 AM in Azure. Please confirm whether the initial email should be launched at 12:00 AM.");
+      if(rem==="yes" && v("remTime")==="12am")add(sf,"The Reminder email launch time is mentioned as 12:00 AM in Azure. Please confirm whether the Reminder should be launched at 12:00 AM.");
+    }
+    if(it==="missing" && rem==="yes" && v("remTime")==="missing")add(sf,"The launch time has not been provided for both the initial and Reminder emails. Please confirm the launch times.");
+    else{
+      if(it==="missing")add(sf,"Launch time for the initial email has not been provided. Please confirm the initial launch time.");
+      if(rem==="yes" && v("remTime")==="missing")add(sf,"Launch time for the Reminder email has not been provided. Please confirm the Reminder launch time.");
+    }
+
+    if(v("assetPrt") && v("azurePrt") && v("assetPrt").trim()!==v("azurePrt").trim())
+      add(sf,"The PRT number mentioned in the campaign asset is "+v("assetPrt")+", whereas Azure mentions "+v("azurePrt")+". Please confirm which PRT number should be used for this campaign.");
+
+    if(v("senderProfile")==="missing")
+      add(sf,"The Sender Profile has not been provided in Azure. Please provide/confirm the Sender Profile to be used for this campaign.");
+    if(v("senderProfile")==="incorrect")
+      add(sf,"The Sender Profile provided in Azure appears to be incorrect. Please provide/confirm the correct Sender Profile to be used for this campaign.");
+  }
+
+  if(v("images")==="pdfOnly")add(ht,"The campaign images cannot be extracted from the provided PDF. Please provide the Figma file or individual campaign images so that the HTML can be developed accurately.");
+  if(v("images")==="no")add(ht,"Campaign images have not been provided. Please provide the required images/Figma file for the campaign.");
+  if(v("unsubscribe")==="update")add(ht,'The footer currently contains an "Update Preference" option instead of "Unsubscribe". Please confirm whether this should be changed to "Unsubscribe" or retained as provided.');
+  if(v("unsubscribe")==="no"){
+    if(type==="both")add(ht,"An Unsubscribe option has not been provided in the campaign asset. As a best practice, we have added an Unsubscribe link to the footer. Please confirm if this is acceptable.");
+    else add(ht,"An Unsubscribe option has not been provided in the campaign asset. Please confirm whether an Unsubscribe link should be added to the footer.");
+  }
+  if(v("links")==="missing")add(ht,"A campaign link has not been provided"+(v("linkDetail")?" for "+v("linkDetail"):"")+". Please provide the URL to be used.");
+  if(v("links")==="error")add(ht,"The provided link"+(v("linkDetail")?" for "+v("linkDetail"):"")+" redirects to an error page. Please confirm whether this URL should be used or provide the correct URL.");
+  if(v("utm")==="no")add(ht,"UTM parameters have not been provided. Please confirm whether we need to add UTM parameters to the links. If yes, please provide the required UTM details.");
+  if(v("address")==="no")add(ht,"The Bayer address has not been provided in the campaign asset. Please confirm whether the Bayer address should be added to the footer.");
+  if(v("mobile")==="yes")add(ht,"A mobile number is provided in the campaign asset. We will make the number clickable using a tel: link so that it can be directly used on mobile devices. Please confirm if this is acceptable.");
+
+  render("sfmcOutput",sf);render("htmlOutput",ht);
+}
+
+function copyText(text,button){
+  function done(){var old=button.textContent;button.textContent="Copied ✓";setTimeout(function(){button.textContent=old},1000)}
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(function(){fallback(text,done)})
+  }else fallback(text,done)
+}
+function fallback(text,done){
+  var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.left="-9999px";document.body.appendChild(ta);ta.select();
+  try{if(document.execCommand("copy"))done();else alert("Copy was blocked. Please copy the text manually.")}catch(e){alert("Copy was blocked. Please copy the text manually.")}
+  document.body.removeChild(ta)
+}
+
+document.querySelectorAll("select,input").forEach(function(el){
+  el.addEventListener("change",function(){syncReminderChoices();visibility();generate()});
+  el.addEventListener("input",function(){syncReminderChoices();visibility();generate()});
+});
+$("copySfmc").addEventListener("click",function(){copyText($("sfmcOutput").textContent,this)});
+$("copyHtml").addEventListener("click",function(){copyText($("htmlOutput").textContent,this)});
+$("copyAll").addEventListener("click",function(){
+  var type=v("requestType"),parts=[];
+  if(type==="both")parts.push("SFMC QUERIES\n\n"+$("sfmcOutput").textContent);
+  if(type==="both"||type==="html")parts.push("HTML QUERIES\n\n"+$("htmlOutput").textContent);
+  copyText(parts.join("\n\n"),this)
+});
+$("reset").addEventListener("click",function(){
+  document.querySelectorAll("select,input").forEach(function(el){el.value=""});
+  visibility();generate()
+});
+syncReminderChoices();visibility();generate();
+})();
+</script>
+</body>
+</html>
